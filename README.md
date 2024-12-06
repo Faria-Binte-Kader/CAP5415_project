@@ -34,4 +34,6 @@ python clip_models_tissuemnist_clip.py
 ```
 This will also generate the corresponding accuracy and F1-scores.
 
-![Model Image](“main/cs5415_vit_text.png”)
+
+
+![Model Image](cs5415_vit_text.png)
