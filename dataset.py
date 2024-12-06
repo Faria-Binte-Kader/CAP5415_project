@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 from torch.utils.data import DataLoader
 import medmnist
 from torchvision import transforms
@@ -167,15 +168,19 @@ class CaptionedMedMNIST(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         image, label = self.dataset[idx]
-        #label_caption = f"This is the picture of {self.label_map[int(label)]}"
+        if isinstance(label, (list, tuple, torch.Tensor, np.ndarray)):  # Handle different types
+            label = label.item() if isinstance(label, torch.Tensor) else label[0]
+
         label_caption = f"This is the photo of a {self.label_map[int(label)]}"
         return image, label_caption, label
 
 # Function to create data loaders for a specific MedMNIST dataset
 def get_medmnist_dataloader(dataset_class, batch_size=32, download=True):
     transform = transforms.Compose([
+        transforms.Grayscale(num_output_channels=3),  # Convert 1-channel grayscale to 3-channel RGB
         transforms.ToTensor(),
-        transforms.Normalize(mean=[.5], std=[.5])  # normalize to [-1, 1]
+        transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+        transforms.Lambda(lambda x: torch.clamp(x, min=0., max=1.))  # Normalize for 3-channel images
     ])
 
     train_dataset = CaptionedMedMNIST(dataset_class, split='train', transform=transform, download=download, size=224)
@@ -190,20 +195,6 @@ def get_medmnist_dataloader(dataset_class, batch_size=32, download=True):
 
 # Function to create data loaders for a specific MedMNIST dataset for "open-clip" models support
 def get_medmnist_dataloader_open_clip(dataset_class, train_transform, test_transform, batch_size=32, download=True):
-
-    # transform = transforms.Compose([
-    #     transforms.ToTensor(),
-    #     transforms.Normalize(mean=[.5], std=[.5])  # normalize to [-1, 1]
-    # ])
-
-    # train_dataset = CaptionedMedMNIST(dataset_class, split='train', transform=transform, download=download, size=224)
-    # test_dataset = CaptionedMedMNIST(dataset_class, split='test', transform=transform, download=download, size=224)
-
-    # train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    # test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
-
-    # return train_loader, test_loader
-    
     #Default Transform
     transform = transforms.Compose([
         transforms.ToTensor(),
