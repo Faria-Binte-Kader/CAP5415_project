@@ -167,7 +167,8 @@ class CaptionedMedMNIST(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         image, label = self.dataset[idx]
-        label_caption = f"This is the picture of {self.label_map[int(label)]}"
+        #label_caption = f"This is the picture of {self.label_map[int(label)]}"
+        label_caption = f"This is the photo of a {self.label_map[int(label)]}"
         return image, label_caption, label
 
 # Function to create data loaders for a specific MedMNIST dataset
@@ -180,6 +181,40 @@ def get_medmnist_dataloader(dataset_class, batch_size=32, download=True):
     train_dataset = CaptionedMedMNIST(dataset_class, split='train', transform=transform, download=download, size=224)
     test_dataset = CaptionedMedMNIST(dataset_class, split='test', transform=transform, download=download, size=224)
 
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+
+    return train_loader, test_loader
+
+
+
+# Function to create data loaders for a specific MedMNIST dataset for "open-clip" models support
+def get_medmnist_dataloader_open_clip(dataset_class, train_transform, test_transform, batch_size=32, download=True):
+
+    # transform = transforms.Compose([
+    #     transforms.ToTensor(),
+    #     transforms.Normalize(mean=[.5], std=[.5])  # normalize to [-1, 1]
+    # ])
+
+    # train_dataset = CaptionedMedMNIST(dataset_class, split='train', transform=transform, download=download, size=224)
+    # test_dataset = CaptionedMedMNIST(dataset_class, split='test', transform=transform, download=download, size=224)
+
+    # train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    # test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+
+    # return train_loader, test_loader
+    
+    #Default Transform
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[.5], std=[.5])  # normalize to [-1, 1]
+    ])
+
+    #Create train and test dataset with model specific transforms
+    train_dataset = CaptionedMedMNIST(dataset_class, split='train', transform=train_transform, download=download, size=224)
+    test_dataset = CaptionedMedMNIST(dataset_class, split='test', transform=test_transform, download=download, size=224)
+
+    #Train and Test Dataloader
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
