@@ -16,12 +16,6 @@ python zero_shot.py \
 You can specify any subset of MedMNIST (BloodMNIST, PathMNIST, OCTMNIST, PneumoniaMNIST, DermaMNIST, RetinaMNIST, BreastMNIST, OrganAMNIST, OrganCMNIST, OrganSMNIST, TissueMNIST) here.
 
 To train our framework model with any of the subsets, you can simply run the python file with the corresponding dataset name-
-```
-python clip_models_bloodmnist_clip.py
-```
-This will also generate the corresponding accuracy and F1-scores.
-
-
 For Fine-Tuned CLIP with custom loss function on the subsets of MedMNIST dataset, run the following,
 ```
 python clip_models_bloodmnist_clip.py
@@ -38,6 +32,6 @@ python clip_models_retinamnist_clip.py
 python clip_models_tissuemnist_clip.py
 
 ```
+This will also generate the corresponding accuracy and F1-scores.
 
-
-![Model Image](“master/cs5415_vit_text.png”)
+![Model Image](“main/cs5415_vit_text.png”)
