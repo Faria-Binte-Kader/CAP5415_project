@@ -1,7 +1,9 @@
 import argparse
+import numpy as np
 import torch
+import sys
 from torch.utils.data import DataLoader
-from transformers import CLIPProcessor, CLIPModel, CoCaProcessor, CoCaModel
+from transformers import CLIPProcessor, CLIPModel
 from sklearn.metrics import classification_report
 from dataset import get_medmnist_dataloader, DATASET_CLASSES
 
@@ -10,12 +12,6 @@ def load_model_and_processor(model_name, model_type):
     if model_type.lower() == "clip":
         model = CLIPModel.from_pretrained(model_name)
         processor = CLIPProcessor.from_pretrained(model_name)
-    elif model_type.lower() == "coca":
-        model = CoCaModel.from_pretrained(model_name)
-        processor = CoCaProcessor.from_pretrained(model_name)
-    elif model_type.lower() == "siglip":
-        # Placeholder for SigLIP (assumes you have a model and processor available for SigLIP)
-        raise NotImplementedError("SigLIP is not implemented in this script. Add your SigLIP model and processor loading here.")
     else:
         raise ValueError(f"Unsupported model type: {model_type}")
     return model, processor
@@ -42,24 +38,19 @@ def zero_shot_classification(dataset_class, batch_size, model_name, model_type):
             labels = labels.to(device)
 
             # Preprocess text captions and images
-            text_inputs = processor(
-                text=captions,  # Using captions directly from the test_loader
-                return_tensors="pt",
-                padding=True
-            ).to(device)
+            text_inputs = processor(text=captions, return_tensors="pt", padding=True).to(device)
             image_inputs = processor(images=images, return_tensors="pt").to(device)
 
             # Perform forward pass
-            if model_type.lower() in ["clip", "coca"]:
-                outputs = model(**image_inputs, text_inputs=text_inputs)
-                logits_per_image = outputs.logits_per_image  # Shape: [batch_size, num_classes]
-            elif model_type.lower() == "siglip":
-                # Add forward pass logic for SigLIP if implemented
-                raise NotImplementedError("SigLIP forward pass is not implemented.")
+            outputs = model(input_ids=text_inputs['input_ids'], attention_mask=text_inputs['attention_mask'],
+                            pixel_values=image_inputs['pixel_values'])
+
+            # Get logits for classification
+            logits_per_image = outputs.logits_per_image  # Shape: [batch_size, num_classes]
+
             
             # Get predictions
             predictions = torch.argmax(logits_per_image, dim=1)
-
             # Store predictions and ground truth
             all_predictions.extend(predictions.cpu().tolist())
             all_ground_truths.extend(labels.cpu().tolist())
@@ -72,7 +63,7 @@ def zero_shot_classification(dataset_class, batch_size, model_name, model_type):
     f1_score = report["macro avg"]["f1-score"]
 
     # Print metrics
-    print(f"Dataset:" {dataset_class})
+    print(dataset_class)
     print(f"Zero-shot classification accuracy: {accuracy * 100:.2f}%")
     print(f"Precision: {precision * 100:.2f}%")
     print(f"Recall: {recall * 100:.2f}%")
@@ -82,8 +73,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Zero-shot classification using CLIP, CoCa, or SigLIP.")
     parser.add_argument("--dataset_class", type=str, required=True, help="Name of the MedMNIST dataset class.")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for evaluation.")
-    parser.add_argument("--model_name", type=str, default="openai/clip-vit-base-patch32", help="Name of the model.")
-    parser.add_argument("--model_type", type=str, choices=["clip", "coca", "siglip"], required=True, help="Type of the model to use.")
+    parser.add_argument("--model_name", type=str, default="openai/clip-vit-base-patch16", help="Name of the model.")
+    parser.add_argument("--model_type", type=str, choices=["clip"], required=True, help="Type of the model to use.")
     
     args = parser.parse_args()
     
