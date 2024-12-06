@@ -2,11 +2,8 @@
 # Instructions
 If your are using any IDE then first clone (git clone <url>) the repository. Then create a virtual environment and activate it. <br>
 
-`conda create -n CAP5415 Python=3.10.12`<br>
-`conda activate CAP5415`
-
-Install all the dependencies.<br>
-`pip install -r requirements.txt`
+`conda env create -f environment.yml`<br>
+`conda activate op_clip`
 
 For zero-shot clasification on any subset of MedMNIST dataset-
 ```
@@ -17,3 +14,24 @@ python zero_shot.py \
   --model_type clip
 ```
 You can specify any subset of MedMNIST (BloodMNIST, PathMNIST, OCTMNIST, PneumoniaMNIST, DermaMNIST, RetinaMNIST, BreastMNIST, OrganAMNIST, OrganCMNIST, OrganSMNIST, TissueMNIST) here.
+
+
+For Fine-Tuned CLIP with custom loss function on the subsets of MedMNIST dataset, run the following,
+```
+python clip_models_bloodmnist_clip.py
+python clip_models_breastmnist_clip.py
+python clip_models_chestmnist_clip.py
+python clip_models_dermamnist_clip.py
+python clip_models_octmnist_clip
+python clip_models_organAmnist_clip.py
+python clip_models_organCmnist_clip
+python clip_models_organSmnist_clip.py
+python clip_models_pathmnist_clip.py
+python clip_models_pneumoniamnist_clip.py
+python clip_models_retinamnist_clip.py
+python clip_models_tissuemnist_clip.py
+
+```
+
+
+![Model Image](“cs5415_vit_text.png”)

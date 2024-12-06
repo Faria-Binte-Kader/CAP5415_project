@@ -228,17 +228,10 @@ for epoch in tqdm(range(10)):
         #classifier
         logits_ce = classifier(image_features)
         
-        # print(logits_ce.shape)
-        # print(labels.shape)
-        # print((labels.squeeze()).shape)
-        # print(logits_ce.shape[0])
-        # print(logits_ce.shape[1])
-        # print((labels.squeeze()).shape[0])
-        # loss_ce = loss_fn_ce(logits_ce, labels.squeeze())
 
         ##Work Around Batch Size of 1 error
         if(logits_ce.shape[0] == 1):
-            loss_ce = loss_fn_ce(logits_ce, labels)
+            loss_ce = loss_fn_ce(logits_ce, labels.squeeze(1))
         else:
             loss_ce = loss_fn_ce(logits_ce, labels.squeeze())
 
