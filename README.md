@@ -40,4 +40,4 @@ python clip_models_tissuemnist_clip.py
 ```
 
 
-![Model Image](“cs5415_vit_text.png”)
+![Model Image](“master/cs5415_vit_text.png”)
